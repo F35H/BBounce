@@ -12,7 +12,8 @@ compile:
 	python main.py
 
 start:
-	python -m nuitka --follow-imports $(PROGRAM)
+	python -m nuitka --follow-imports $(PROGRAM).py
+	$(PROGRAM).exe
 	
 clean:
 	rm *.cmd *.exe

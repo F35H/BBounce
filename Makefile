@@ -5,7 +5,7 @@ upload:
 	git add *
 	git add Makefile
 	git commit -m "MakeUpdate" 
-	git branch -M development 
+	git branch -M main
 	git push -u origin development
 	
 compile:

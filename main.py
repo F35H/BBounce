@@ -1,68 +1,80 @@
 from direct.showbase.ShowBase import ShowBase
 
 from panda3d.core import	AmbientLight, PointLight
-from panda3d.core import	PerspectiveLens
+from panda3d.core import	ClockObject
 
 import math
-"""
-class ComFunc():
-	def CircFunc(self, amp, x, y)
-	x += math.cos()
-	y += math.sin()
-		return dict(x=x,y=y)
-"""
+
 class StartSet(ShowBase):
 	
-	_sphere = None	#Model
-	__aL = None	#AmbientLight
-	__sP = None #Spotlight
-	
-	__aLN = "AmbientLight"
-	__sPN = "Spotlight"
+	#Base
+	__centrlCube = None
+	__keyMap = None
+	__camTime = 0
+	frameDegree = 90
+	#Molecules
+	__sphere = None
+	__bond = None
 	
 	def __init__(self):
 		ShowBase.__init__(self)
 		self.__GameSet()
-		self.__ModelLoad()
-		self.__GameBackground()
+		self.__BaseLoad()
 		
 	def __GameSet(self):
+		globalClock.setMode(ClockObject.MLimited)
+		globalClock.setFrameRate(60)
+		
 		self.disableMouse()
 
-	
-	def __GameBackground(self):
-		tempSP = None
-		tempAL = None
+	def __BaseLoad(self):
+		self.__centrlCube = self.loader.loadModel("bam/cube.bam")
 		
-		self.__aL = AmbientLight(self.__aLN)
-		self.__sP = PointLight(self.__aLN)
+		self.__keyMap = [0] * 2
+			
+		self.__centrlCube.setPos(0,0,0)
+#		self.__centrlCube.setColor()
 		
-		self.__aL.setColor((0.5,0.5,0.5,1))
-		self.__sP.setColor((200,200,200,1))
-		self.__sP.setLens(PerspectiveLens())
-		
-		self.setBackgroundColor(0.53, 0.80, 0.92, 1)
-		
-		tempSP = self.render.attachNewNode(self.__sP)
-		tempAL = self.render.attachNewNode(self.__aL)
-		
-#		self.__sP = tempSP
-#		self.__aL = tempAL
-		
-		tempSP.setPos(0,15,0)
-#		tempSP.lookAt(self._sphere)
-		
-		self.render.setLight(tempAL)
-#		self.render.setLight(tempSP)
-		
-	def __ModelLoad(self):
-		self._sphere = self.loader.loadModel("bam/sphere.bam")
-		self._sphere.reparentTo(self.render)
-#		self.sphere.setScale(0.25, 0.25, 0.25)
-		self._sphere.setPos(0, 10, 0)
-		self._sphere.setColor(0.0,0.5,0.5,1)
-		self._sphere.setTwoSided(True)
+		self.accept("space", self.__KeySet, [0,0])
 
+		self.__centrlCube.reparentTo(self.render)
+		
+		self.camera.setPos(self.__centrlCube.getX(),
+			self.__centrlCube.getY() + 20, 0)
+
+		self.taskMgr.add(self.__KeySwitch, "moveTask")
+		
+	def __KeySet(self, index, dummy):
+		match index:
+			case 0:
+				if self.__keyMap[index]:
+					self.__keyMap[index] = False
+				else:
+					self.__keyMap[index] = True 
+				 
+	def __KeySwitch(self, task):
+		if self.__keyMap[0]:
+			self.__CameraMV(True)
+		else:
+			self.__CameraMV(False)
+		return task.cont	
+		
+	def __CameraMV(self, boolean):
+		if boolean:
+			self.frameDegree += 1
+			deltaTime = base.clock.dt
+			cos = math.cos(math.radians(self.frameDegree))
+			cosval = cos*20
+			sin = math.sin(math.radians(self.frameDegree))
+			sinval = sin*20
+			self.camera.setPos(self.__centrlCube.getX() + cosval,
+				self.__centrlCube.getY() + sinval, 0)
+				
+			self.__camTime += 1
+		else:
+			self.__camTime = 0
+			
+		self.camera.lookAt(self.__centrlCube)
 
 __game = StartSet()
 __game.run()

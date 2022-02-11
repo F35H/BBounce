@@ -5,8 +5,8 @@ upload:
 	git add *
 	git add Makefile
 	git commit -m "MakeUpdate" 
-	git branch -M main
-	git push -u origin main
+	git branch -M development
+	git push -u origin development
 	
 compile:
 	python main.py

@@ -1,8 +1,10 @@
 from direct.showbase.ShowBase import ShowBase
+from direct.gui.OnscreenText import OnscreenText
 
 from panda3d.core import	AmbientLight, PointLight
 from panda3d.core import	ClockObject
 
+from threading import Thread
 import math
 
 
@@ -16,7 +18,28 @@ class GameMain(ShowBase):
 		Clock.setFrameRate(60)
 		
 		self.disableMouse()
-
+	
+class MenuButs():
+	
+	def __init__(self):
+		self.__ErlMod = base.loader.loadModel("bam/erlflask.bam")
+		
+		
+		ErlLoad = lambda ErlMod:
+			self.ErlMods = [(base.loader.loadModel("bam/erlflask.bam"),
+			base.loader.loadModel("bam/erlflask.bam"))] * 4 
+		
+		Threads(ErlLoad(ErlMod))
+		
+		self.menImg[0] = base.loader.loadTexture("texture/MenBut/BBLogo.png")
+		self.menImg[1] = base.loader.loadTexture("texture/MenBut/BBPlay.png")
+		self.menImg[2] = base.loader.loadTexture("texture/MenBut/BBAbout.png")
+		self.menImg[3] = base.loader.loadTexture("texture/MenBut/BBHow.png")
+		self.menImg[4] = base.loader.loadTexture("texture/MenBut/BBExit.png")
+		return menTup
+		
+	def __del__(self):
+		
 
 class GameInit(ShowBase):
 	
@@ -29,7 +52,12 @@ class GameInit(ShowBase):
 	__sphere = None
 	__bond = None
 	
+	def __WinInit(self):
+		global base
+		base = ShowBase()
+		
 	def __init__(self):
+		self.__WinInit()
 		self.__LoadSet()
 		self.__LoadInit() 
 		self.__ModelLoad()
@@ -40,7 +68,6 @@ class GameInit(ShowBase):
 		base.disableMouse()
 		base.clock.setMode(ClockObject.MLimited)
 		base.clock.setFrameRate(2)
-		
 		base.setBackgroundColor(0, 0, 0, 1)
 
 	def __LoadInit(self):
@@ -50,6 +77,9 @@ class GameInit(ShowBase):
 		self.__bubbleOne = base.loader.loadModel("bam/sphere.bam")
 		self.__bubbleTwo = base.loader.loadModel("bam/sphere.bam")
 		self.__bubbleThree = base.loader.loadModel("bam/sphere.bam")
+		self.__loadingText = OnscreenText("Loading!",
+		style=1, fg=(1, 1, 1, 1), shadow=(0, 0, 0, 0),
+			pos=(0,-0.3), scale = .07)
 		
 		self.__erlFlask.setColor(1,1,1,0.7)
 		self.__bubbleOne.setColor(1,1,1,1)
@@ -69,6 +99,7 @@ class GameInit(ShowBase):
 		self.__bubbleOne.hide()
 		self.__bubbleTwo.hide()
 		self.__bubbleThree.hide()
+		self.__loadingText.hide()
 		
 		base.camera.setPos(self.__erlFlask.getX(),
 			self.__erlFlask.getY() + 20, 0)
@@ -85,61 +116,49 @@ class GameInit(ShowBase):
 		self.__frames += 1
 		self.__bubbleOne.hide() if self.__frames % 2 == 0 else self.__bubbleOne.show() 
 		self.__bubbleTwo.hide() if self.__frames % 3 == 0 else self.__bubbleTwo.show() 
-		self.__bubbleThree.hide() if self.__frames % 4 == 0 else self.__bubbleThree.show() 
+		self.__bubbleThree.hide() if self.__frames % 4 == 0 else self.__bubbleThree.show()
+		
+		self.__loadingText.hide() if self.__frames % 5 == 0 else self.__loadingText.show()
+		 
 		return task.cont
-				
-	def __WinInit(self)
-		global base
-		base = ShowBase()
 		
 	def __ModelLoad(self):
-		global sphere
-		global bond
-		
-		sphere = [0] * 10
-		bond = [0] * 15
+		self.menImg = [0] * 5
+		self.menErl = [0] * 8
 		
 		centrlCube = base.loader.loadModel("bam/cube.bam")
-		sphere[0] = base.loader.loadModel("bam/sphere.bam")
-		sphere[1] = base.loader.loadModel("bam/sphere.bam")
-		sphere[2] = base.loader.loadModel("bam/sphere.bam")
-		sphere[3] = base.loader.loadModel("bam/sphere.bam")
-		sphere[4] = base.loader.loadModel("bam/sphere.bam")
-		sphere[5] = base.loader.loadModel("bam/sphere.bam")
-		sphere[6] = base.loader.loadModel("bam/sphere.bam")
-		sphere[7] = base.loader.loadModel("bam/sphere.bam")
-		sphere[8] = base.loader.loadModel("bam/sphere.bam")
-		sphere[9] = base.loader.loadModel("bam/sphere.bam")
-#		sphere[10] = base.loader.loadModel("bam/sphere.bam")
-		bond[0] = base.loader.loadModel("bam/bond.bam")
-		bond[1] = base.loader.loadModel("bam/bond.bam")
-		bond[2] = base.loader.loadModel("bam/bond.bam")
-		bond[3] = base.loader.loadModel("bam/bond.bam")
-		bond[4] = base.loader.loadModel("bam/bond.bam")
-		bond[5] = base.loader.loadModel("bam/bond.bam")
-		bond[6] = base.loader.loadModel("bam/bond.bam")
-		bond[7] = base.loader.loadModel("bam/bond.bam")
-		bond[8] = base.loader.loadModel("bam/bond.bam")
-		bond[9] = base.loader.loadModel("bam/bond.bam")
-		bond[10] = base.loader.loadModel("bam/bond.bam")
-		bond[11] = base.loader.loadModel("bam/bond.bam")
-		bond[12] = base.loader.loadModel("bam/bond.bam")
-		bond[13] = base.loader.loadModel("bam/bond.bam")
-		bond[14] = base.loader.loadModel("bam/bond.bam")
-#		bond[15] = base.loader.loadModel("bam/bond.bam")
-		"""
-		erlOne = self.loader.loadModel("bam/erlflask.bam")
-		erlTwo = self.loader.loadModel("bam/erlflask.bam")
-		erlThree = self.loader.loadModel("bam/erlflask.bam")
-		erlFour = self.loader.loadModel("bam/erlflask.bam")
-		playBut = loadObject("PlayBut.png")
-		howBut = loadObject("HowPlayBut.png")
-		aboutBut = loadObject("aboutbut.png")
-		exitBut = loadObject("exitBut.png")
-		"""
+		
+		self.menImg[0] = base.loader.loadTexture("texture/MenBut/BBLogo.png")
+		self.menImg[1] = base.loader.loadTexture("texture/MenBut/BBPlay.png")
+		self.menImg[2] = base.loader.loadTexture("texture/MenBut/BBAbout.png")
+		self.menImg[3] = base.loader.loadTexture("texture/MenBut/BBHow.png")
+		self.menImg[4] = base.loader.loadTexture("texture/MenBut/BBExit.png")
+		
+		self.menErl[0] = base.loader.loadModel("bam/erlflask.bam")
+		self.menErl[1] = base.loader.loadModel("bam/erlflask.bam")
+		self.menErl[2] = base.loader.loadModel("bam/erlflask.bam")
+		self.menErl[3] = base.loader.loadModel("bam/erlflask.bam")
+		self.menErl[4] = base.loader.loadModel("bam/erlflask.bam")
+		self.menErl[5] = base.loader.loadModel("bam/erlflask.bam")
+		self.menErl[6] = base.loader.loadModel("bam/erlflask.bam")
+		self.menErl[7] = base.loader.loadModel("bam/erlflask.bam")
+		
+		
+		
+		
+		#FrontLoad Goes Here
+			
 		
 	def __LoadClose(self):
-		taskMgr.remove("BubblePop")
+		
+		taskMgr.remove("BubblePop")	
+
+	def __MenRend():
+			
+	def __MenSet():
+		base.clock.setFrameRate(2)
+		
+	
 		
 		
 		

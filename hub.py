@@ -4,11 +4,18 @@ from direct.gui.OnscreenText import OnscreenText
 from panda3d.core import	AmbientLight, PointLight
 from panda3d.core import	ClockObject
 
-from threading import Thread
+import threading
 import math
+
+butList = []
+atomList = []
+bondList = []
+
+
 
 
 class GameMain(ShowBase):
+	
 	
 	def __init__(self):
 		print("Hello!")
@@ -19,50 +26,82 @@ class GameMain(ShowBase):
 		
 		self.disableMouse()
 	
-class MenuButs():
 	
-	def __init__(self):
-		self.__ErlMod = base.loader.loadModel("bam/erlflask.bam")
+class MenBut(object):
+	def __new__(self, selectNum):
+		self.modTup = self.__ModLoad(selectNum)
+		self.__EndSet(selectNum)	
+		return self.modTup
+	
+	def __Texload(num):
+		match num:
+			case 0: return base.loader.loadTexture("texture/MenBut/BBLogo.png")
+			case 1: return base.loader.loadTexture("texture/MenBut/BBPlay.png")
+			case 2: return base.loader.loadTexture("texture/MenBut/BBAbout.png")
+			case 3: return base.loader.loadTexture("texture/MenBut/BBHow.png")
+			case 4: return base.loader.loadTexture("texture/MenBut/BBExit.png")
+			case _: print("Caution: wrong Variable in menbut!")
+	
+	def __ModLoad(num):
+		MenBut.modTup = [0,0,0]
+		
+		MenBut.modTup[0] = base.loader.loadModel("bam/erlflask.bam")
+		if num < 1:
+			MenBut.modTup[1] = base.loader.loadModel("bam/logo.bam")
+		else:
+			MenBut.modTup[1] = base.loader.loadModel("bam/menBut.bam")
+		MenBut.modTup[2] = base.loader.loadModel("bam/erlflask.bam")
+		
+		return MenBut.modTup
+		
+	def __EndSet(num):
+#			self.modTup[0]
+#		MenBut.modTup[0].setTexture(MenBut.textTup[1], 1)
+#		MenBut.modTup[2]
+			
+		MenBut.modTup[0].setPos(5,-20,0)
+		MenBut.modTup[1].setPos(0,-20,0)
+		MenBut.modTup[2].setPos(-5,-20,0)
+			
+class Atom():
+	def __new__(self):
+		self.__load__()
+		return self.atom
+		
+	def __load__():
+		Atom.atom = base.loader.loadModel("bam/sphere.bam")
+		
+		Atom.atom.setColor(0,0,0,1)
 		
 		
-		ErlLoad = lambda ErlMod:
-			self.ErlMods = [(base.loader.loadModel("bam/erlflask.bam"),
-			base.loader.loadModel("bam/erlflask.bam"))] * 4 
+class Bond():
+	def __new__(self):
+		self.__load__()
+		return self.bond
 		
-		Threads(ErlLoad(ErlMod))
+	def __load__():
+		Bond.bond = base.loader.loadModel("bam/bond.bam")
 		
-		self.menImg[0] = base.loader.loadTexture("texture/MenBut/BBLogo.png")
-		self.menImg[1] = base.loader.loadTexture("texture/MenBut/BBPlay.png")
-		self.menImg[2] = base.loader.loadTexture("texture/MenBut/BBAbout.png")
-		self.menImg[3] = base.loader.loadTexture("texture/MenBut/BBHow.png")
-		self.menImg[4] = base.loader.loadTexture("texture/MenBut/BBExit.png")
-		return menTup
-		
-	def __del__(self):
+		Bond.bond.setColor(0,0,0,1)
+
 		
 
 class GameInit(ShowBase):
-	
-	#Base
-	__centrlCube = None
-	__keyMap = None
+
 	__camTime = 0
 	frameDegree = 90
-	#Molecules
-	__sphere = None
-	__bond = None
 	
-	def __WinInit(self):
-		global base
-		base = ShowBase()
-		
 	def __init__(self):
 		self.__WinInit()
 		self.__LoadSet()
 		self.__LoadInit() 
-		self.__ModelLoad()
-#		self.__LoadClose()
+		self.__ModelLoad(500, 5, 1)
+		self.__LoadClose()
 #		GameMain()
+
+	def __WinInit(self):
+		global base
+		base = ShowBase()
 
 	def __LoadSet(self):
 		base.disableMouse()
@@ -122,44 +161,64 @@ class GameInit(ShowBase):
 		 
 		return task.cont
 		
-	def __ModelLoad(self):
-		self.menImg = [0] * 5
-		self.menErl = [0] * 8
+	def __ModelLoad(self, bondNum=50, menNum=0, cubeNum=0):
+		global butList
+		global atomList
+		global bondList
+		self.bondNum = bondNum
+		self.menNum = menNum
+		self.cubeNum = cubeNum
+		self.atomNum = math.floor((.6666 * bondNum)) 
 		
-		centrlCube = base.loader.loadModel("bam/cube.bam")
+		 #I attempted to make the loading screen render.
+		 #The for loop allows it to load so fast that it's no use. I benchmarked this to 
+		 #around 10000 models, and it still loaded in less than half a second on a 10-year-old laptop.
+		 #However, the loading screen looks quite nice if you're willing to enable it.
+
+		threading.Thread(target=self.__MThreadLoad()) 
 		
-		self.menImg[0] = base.loader.loadTexture("texture/MenBut/BBLogo.png")
-		self.menImg[1] = base.loader.loadTexture("texture/MenBut/BBPlay.png")
-		self.menImg[2] = base.loader.loadTexture("texture/MenBut/BBAbout.png")
-		self.menImg[3] = base.loader.loadTexture("texture/MenBut/BBHow.png")
-		self.menImg[4] = base.loader.loadTexture("texture/MenBut/BBExit.png")
+	def __MThreadLoad(self):
+			global butList
+			global atomList
+			global bondList
+			for i in range(150):
+				if i < self.cubeNum: self.__centrlCube = base.loader.loadModel("bam/cube.bam")
+				if i < self.menNum: butList.append(MenBut(i))
+				if i < self.atomNum: atomList.append(Atom())
+				bondList.append(Bond())
+
+				while(threading.active_count() > 50):
+					print("Thread Count Over 50! Loop" % i)
 		
-		self.menErl[0] = base.loader.loadModel("bam/erlflask.bam")
-		self.menErl[1] = base.loader.loadModel("bam/erlflask.bam")
-		self.menErl[2] = base.loader.loadModel("bam/erlflask.bam")
-		self.menErl[3] = base.loader.loadModel("bam/erlflask.bam")
-		self.menErl[4] = base.loader.loadModel("bam/erlflask.bam")
-		self.menErl[5] = base.loader.loadModel("bam/erlflask.bam")
-		self.menErl[6] = base.loader.loadModel("bam/erlflask.bam")
-		self.menErl[7] = base.loader.loadModel("bam/erlflask.bam")
-		
-		
-		
-		
-		#FrontLoad Goes Here
-			
-		
+
+
+
 	def __LoadClose(self):
-		
 		taskMgr.remove("BubblePop")	
 
-	def __MenRend():
+		for i in range(4):
+#			butList[i][0].reparentTo(base.render)
+			butList[i][1].reparentTo(base.render)
+#			butList[i][2].reparentTo(base.render)
+		
+#		base.camera.setZ(20)
+
+		base.camera.lookAt(butList[2][1])
+		
+		self.__erlFlask.detachNode()
+		self.__bubbleOne.detachNode()
+		self.__bubbleTwo.detachNode()
+		self.__bubbleThree.detachNode()
+		self.__loadingText.detachNode()
+		
+		del self.__erlFlask
+		del self.__bubbleOne
+		del self.__bubbleTwo
+		del self.__bubbleThree
+		del self.__loadingText
+		
+
 			
-	def __MenSet():
-		base.clock.setFrameRate(2)
-		
-	
-		
 		
 		
 		
@@ -178,8 +237,6 @@ class GameInit(ShowBase):
 			self.__centrlCube.getY() + 20, 0)
 
 		self.taskMgr.add(self.__KeySwitch, "moveTask")
-		
-		return True
 		
 	def __KeySet(self, index, dummy):
 		match index:

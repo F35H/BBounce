@@ -6,6 +6,7 @@ from panda3d.core import	ClockObject
 
 import threading
 import math
+import time
 
 butList = []
 atomList = []
@@ -26,7 +27,7 @@ class GameMain(ShowBase):
 		
 		self.disableMouse()
 	
-	#test
+
 class MenBut(object):
 	def __new__(self, selectNum):
 		self.modTup = self.__ModLoad(selectNum)
@@ -92,11 +93,12 @@ class GameInit(ShowBase):
 	frameDegree = 90
 	
 	def __init__(self):
+
 		self.__WinInit()
 		self.__LoadSet()
 		self.__LoadInit() 
-		self.__ModelLoad(500, 5, 1)
-		self.__LoadClose()
+		if len(self.__modThreads) == self.bondNum:
+			self.__LoadClose()
 #		GameMain()
 
 	def __WinInit(self):
@@ -104,13 +106,14 @@ class GameInit(ShowBase):
 		base = ShowBase()
 
 	def __LoadSet(self):
-		base.disableMouse()
-		base.clock.setMode(ClockObject.MLimited)
-		base.clock.setFrameRate(2)
-		base.setBackgroundColor(0, 0, 0, 1)
-
-	def __LoadInit(self):
-		self.__frames = 0 #BubblePopVar
+		#Originally these variables were in LoadInit, however, they needed to be moved for the recursive function in the multithread
+		self.__frames = 0 
+		self.__modThreads = []
+		
+		self.bondNum = 1
+		self.menNum = 1
+		self.cubeNum = 1
+		self.atomNum = math.floor((.6666 * self.bondNum))
 		
 		self.__erlFlask = base.loader.loadModel("bam/erlflask.bam")
 		self.__bubbleOne = base.loader.loadModel("bam/sphere.bam")
@@ -120,6 +123,13 @@ class GameInit(ShowBase):
 		style=1, fg=(1, 1, 1, 1), shadow=(0, 0, 0, 0),
 			pos=(0,-0.3), scale = .07)
 		
+		base.disableMouse()
+		base.clock.setMode(ClockObject.MLimited)
+		base.clock.setFrameRate(7)
+		base.setBackgroundColor(0, 0, 0, 1)
+
+	def __LoadInit(self):
+		print("test")
 		self.__erlFlask.setColor(1,1,1,0.7)
 		self.__bubbleOne.setColor(1,1,1,1)
 		self.__bubbleTwo.setColor(1,1,1,1)
@@ -135,11 +145,6 @@ class GameInit(ShowBase):
 		self.__bubbleTwo.setScale(0.15)
 		self.__bubbleThree.setScale(0.1)
 		
-		self.__bubbleOne.hide()
-		self.__bubbleTwo.hide()
-		self.__bubbleThree.hide()
-		self.__loadingText.hide()
-		
 		base.camera.setPos(self.__erlFlask.getX(),
 			self.__erlFlask.getY() + 20, 0)
 		base.camera.lookAt(self.__erlFlask)
@@ -151,55 +156,48 @@ class GameInit(ShowBase):
 		
 		base.taskMgr.add(self.__BubblePop, "BubblePop")
 		
+		
 	def __BubblePop(self, task):
-		self.__frames += 1
 		self.__bubbleOne.hide() if self.__frames % 2 == 0 else self.__bubbleOne.show() 
 		self.__bubbleTwo.hide() if self.__frames % 3 == 0 else self.__bubbleTwo.show() 
 		self.__bubbleThree.hide() if self.__frames % 4 == 0 else self.__bubbleThree.show()
 		
-		self.__loadingText.hide() if self.__frames % 5 == 0 else self.__loadingText.show()
-		 
+		self.__modThreads.append(threading.Thread(target=self.__MThreadLoad()))
+		self.__modThreads[self.__frames].start()
+		print(len(self.__modThreads))
+		if len(self.__modThreads) >= self.bondNum:
+			self.__LoadInit()
+		
+		self.__frames += 1
 		return task.cont
-		
-	def __ModelLoad(self, bondNum=50, menNum=0, cubeNum=0):
-		global butList
-		global atomList
-		global bondList
-		self.bondNum = bondNum
-		self.menNum = menNum
-		self.cubeNum = cubeNum
-		self.atomNum = math.floor((.6666 * bondNum)) 
-		
-		 #I attempted to make the loading screen render.
-		 #The for loop allows it to load so fast that it's no use. I benchmarked this to 
-		 #around 10000 models, and it still loaded in less than half a second on a 10-year-old laptop.
-		 #However, the loading screen looks quite nice if you're willing to enable it.
-
-		threading.Thread(target=self.__MThreadLoad()) 
 		
 	def __MThreadLoad(self):
 			global butList
 			global atomList
 			global bondList
-			for i in range(150):
-				if i < self.cubeNum: self.__centrlCube = base.loader.loadModel("bam/cube.bam")
-				if i < self.menNum: butList.append(MenBut(i))
-				if i < self.atomNum: atomList.append(Atom())
-				bondList.append(Bond())
-
-				while(threading.active_count() > 50):
-					print("Thread Count Over 50! Loop" % i)
-		
-
-
+			lock = threading.Lock()
+			
+			if self.bondNum != 0:
+				if self.bondNum < self.cubeNum:
+#					print("Loading Model Cube. Loop %" % str(self.bondNum))
+					with lock: self.__centrlCube = base.loader.loadModel("bam/cube.bam")
+				if self.bondNum < self.menNum:
+#					print("Loading Menu Buttons. Loop %" % str(self.bondNum))
+					with lock: butList.append(MenBut(self.bondNum))
+				if self.bondNum < self.atomNum: 
+#					print("Loading Menu Buttons. Loop: %" % str(self.bondNum))
+					with lock: atomList.append(Atom())
+#				print("Loading Bonds. Loop: %" % str(self.bondNum))
+				with lock: bondList.append(Bond())
+				with lock: self.bondNum -= 1
 
 	def __LoadClose(self):
 		taskMgr.remove("BubblePop")	
-
+			
 		for i in range(4):
-#			butList[i][0].reparentTo(base.render)
+			butList[i][0].reparentTo(base.render)
 			butList[i][1].reparentTo(base.render)
-#			butList[i][2].reparentTo(base.render)
+			butList[i][2].reparentTo(base.render)
 		
 #		base.camera.setZ(20)
 

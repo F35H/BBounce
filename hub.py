@@ -28,7 +28,7 @@ class GameMain(ShowBase):
 		self.disableMouse()
 	
 
-class MenBut(object):
+class MenBut():
 	def __new__(self, selectNum):
 		self.modTup = self.__ModLoad(selectNum)
 		self.__EndSet(selectNum)	
@@ -93,28 +93,32 @@ class GameInit(ShowBase):
 	frameDegree = 90
 	
 	def __init__(self):
-
 		self.__WinInit()
-		self.__LoadSet()
-		self.__LoadInit() 
-		if len(self.__modThreads) == self.bondNum:
-			self.__LoadClose()
 #		GameMain()
 
 	def __WinInit(self):
 		global base
 		base = ShowBase()
+		self.__LoadSet()
 
 	def __LoadSet(self):
-		#Originally these variables were in LoadInit, however, they needed to be moved for the recursive function in the multithread
-		self.__frames = 0 
+		base.disableMouse()
+		base.clock.setMode(ClockObject.MLimited)
+		#The loading sequence loads significantly slower when unlimited.
+		base.clock.setFrameRate(10000)
+		base.setBackgroundColor(0, 0, 0, 1)
+		self.__LoadInit() 
+
+	def __LoadInit(self):
+		#Vars for Bubble Pop
 		self.__modThreads = []
-		
-		self.bondNum = 1
-		self.menNum = 1
+		self.__frames = 0
+		self.bondNum = 150
+		self.bondCheck = self.bondNum
+		self.menNum = 5
 		self.cubeNum = 1
 		self.atomNum = math.floor((.6666 * self.bondNum))
-		
+		#Vars for LoadInit
 		self.__erlFlask = base.loader.loadModel("bam/erlflask.bam")
 		self.__bubbleOne = base.loader.loadModel("bam/sphere.bam")
 		self.__bubbleTwo = base.loader.loadModel("bam/sphere.bam")
@@ -123,13 +127,6 @@ class GameInit(ShowBase):
 		style=1, fg=(1, 1, 1, 1), shadow=(0, 0, 0, 0),
 			pos=(0,-0.3), scale = .07)
 		
-		base.disableMouse()
-		base.clock.setMode(ClockObject.MLimited)
-		base.clock.setFrameRate(7)
-		base.setBackgroundColor(0, 0, 0, 1)
-
-	def __LoadInit(self):
-		print("test")
 		self.__erlFlask.setColor(1,1,1,0.7)
 		self.__bubbleOne.setColor(1,1,1,1)
 		self.__bubbleTwo.setColor(1,1,1,1)
@@ -152,56 +149,63 @@ class GameInit(ShowBase):
 		self.__erlFlask.reparentTo(base.render)
 		self.__bubbleOne.reparentTo(base.render)
 		self.__bubbleTwo.reparentTo(base.render)
-		self.__bubbleThree.reparentTo(base.render)
+		self.__bubbleThree.reparentTo(base.render)	
 		
 		base.taskMgr.add(self.__BubblePop, "BubblePop")
 		
-		
 	def __BubblePop(self, task):
-		self.__bubbleOne.hide() if self.__frames % 2 == 0 else self.__bubbleOne.show() 
-		self.__bubbleTwo.hide() if self.__frames % 3 == 0 else self.__bubbleTwo.show() 
-		self.__bubbleThree.hide() if self.__frames % 4 == 0 else self.__bubbleThree.show()
+		if self.__frames % 10 == 0:
+			self.__bubbleOne.hide() if self.__frames % 7 == 0 else self.__bubbleOne.show() 
+			self.__bubbleThree.hide() if self.__frames % 4 == 0 else self.__bubbleThree.show()
+			self.__bubbleTwo.hide() if self.__frames % 3 == 0 else self.__bubbleTwo.show() 
 		
-		self.__modThreads.append(threading.Thread(target=self.__MThreadLoad()))
-		self.__modThreads[self.__frames].start()
-		print(len(self.__modThreads))
-		if len(self.__modThreads) >= self.bondNum:
-			self.__LoadInit()
-		
-		self.__frames += 1
-		return task.cont
-		
-	def __MThreadLoad(self):
-			global butList
-			global atomList
-			global bondList
-			lock = threading.Lock()
+		if self.__frames >= self.bondCheck:
+			for i in range(len(self.__modThreads)):
+				self.__modThreads[i][0].join()
+				self.__modThreads[i][1].join()
+				self.__modThreads[i][2].join()
+			self.__LoadClose()
+		else:
+			threading.Thread(target = self.MThreadLoad()) 	
 			
-			if self.bondNum != 0:
-				if self.bondNum < self.cubeNum:
-#					print("Loading Model Cube. Loop %" % str(self.bondNum))
-					with lock: self.__centrlCube = base.loader.loadModel("bam/cube.bam")
-				if self.bondNum < self.menNum:
-#					print("Loading Menu Buttons. Loop %" % str(self.bondNum))
-					with lock: butList.append(MenBut(self.bondNum))
-				if self.bondNum < self.atomNum: 
-#					print("Loading Menu Buttons. Loop: %" % str(self.bondNum))
-					with lock: atomList.append(Atom())
-#				print("Loading Bonds. Loop: %" % str(self.bondNum))
-				with lock: bondList.append(Bond())
-				with lock: self.bondNum -= 1
+			self.bondNum -= 1
+			self.__frames += 1
+		return task.cont
+	
+	def MThreadLoad(self):	
+		lock = threading.Lock()
+		
+		with lock:
+			self.__modThreads.append((threading.Thread(target = self.EssentialModLoad()),
+			threading.Thread(target = self.AtomLoad()),
+			threading.Thread(target = self.BondLoad())))
+			
+			self.__modThreads[self.__frames][0].start()
+			self.__modThreads[self.__frames][1].start()
+			self.__modThreads[self.__frames][2].start()
+			
+	def EssentialModLoad(self):
+		global butList
+		
+		if self.bondNum < self.cubeNum:
+			self.__centrlCube = base.loader.loadModel("bam/cube.bam")
+		if self.bondNum < self.menNum:
+			butList.append(MenBut(self.bondNum))
+			
+	def AtomLoad(self):
+		global atomList
+		
+		if self.bondNum < self.atomNum: 
+			atomList.append(Atom())
+			
+	def BondLoad(self):
+		global bondList
+		bondList.append(Bond())
 
 	def __LoadClose(self):
 		taskMgr.remove("BubblePop")	
-			
-		for i in range(4):
-			butList[i][0].reparentTo(base.render)
-			butList[i][1].reparentTo(base.render)
-			butList[i][2].reparentTo(base.render)
-		
+				
 #		base.camera.setZ(20)
-
-		base.camera.lookAt(butList[2][1])
 		
 		self.__erlFlask.detachNode()
 		self.__bubbleOne.detachNode()
@@ -215,7 +219,12 @@ class GameInit(ShowBase):
 		del self.__bubbleThree
 		del self.__loadingText
 		
+		for i in range(len(butList)):
+			butList[i][0].reparentTo(base.render)
+			butList[i][1].reparentTo(base.render)
+			butList[i][2].reparentTo(base.render)
 
+		base.camera.lookAt(butList[2][1])
 			
 		
 		

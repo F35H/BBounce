@@ -12,9 +12,6 @@ butList = []
 atomList = []
 bondList = []
 
-
-
-
 class GameMain(ShowBase):
 	
 	
@@ -47,7 +44,7 @@ class MenBut():
 		MenBut.modTup = [0,0,0]
 		
 		MenBut.modTup[0] = base.loader.loadModel("bam/erlflask.bam")
-		if num < 1:
+		if num == 1:
 			MenBut.modTup[1] = base.loader.loadModel("bam/logo.bam")
 		else:
 			MenBut.modTup[1] = base.loader.loadModel("bam/menBut.bam")
@@ -60,9 +57,25 @@ class MenBut():
 #		MenBut.modTup[0].setTexture(MenBut.textTup[1], 1)
 #		MenBut.modTup[2]
 			
-		MenBut.modTup[0].setPos(5,-20,0)
-		MenBut.modTup[1].setPos(0,-20,0)
-		MenBut.modTup[2].setPos(-5,-20,0)
+		if num == 1:
+			MenBut.modTup[0].hide()
+			MenBut.modTup[1].setPos(0,-20, 1)
+			MenBut.modTup[2].hide()
+			
+			
+		else:
+			MenBut.modTup[0].setPos(7,-20,-0.4)
+			MenBut.modTup[1].setPos(0,-20,-0)
+			MenBut.modTup[2].setPos(-7,-20,-0.4)
+			
+		MenBut.modTup[0].setScale(0.20)
+		MenBut.modTup[1].setScale(0.75)
+		MenBut.modTup[2].setScale(0.20)
+		
+		MenBut.modTup[0].setHpr(0,0,-40)
+		MenBut.modTup[2].setHpr(0,0,40)
+		
+		
 			
 class Atom():
 	def __new__(self):
@@ -73,8 +86,7 @@ class Atom():
 		Atom.atom = base.loader.loadModel("bam/sphere.bam")
 		
 		Atom.atom.setColor(0,0,0,1)
-		
-		
+	
 class Bond():
 	def __new__(self):
 		self.__load__()
@@ -84,8 +96,6 @@ class Bond():
 		Bond.bond = base.loader.loadModel("bam/bond.bam")
 		
 		Bond.bond.setColor(0,0,0,1)
-
-		
 
 class GameInit(ShowBase):
 
@@ -118,6 +128,7 @@ class GameInit(ShowBase):
 		self.menNum = 5
 		self.cubeNum = 1
 		self.atomNum = math.floor((.6666 * self.bondNum))
+		
 		#Vars for LoadInit
 		self.__erlFlask = base.loader.loadModel("bam/erlflask.bam")
 		self.__bubbleOne = base.loader.loadModel("bam/sphere.bam")
@@ -187,9 +198,9 @@ class GameInit(ShowBase):
 	def EssentialModLoad(self):
 		global butList
 		
-		if self.bondNum < self.cubeNum:
+		if self.bondNum <= self.cubeNum:
 			self.__centrlCube = base.loader.loadModel("bam/cube.bam")
-		if self.bondNum < self.menNum:
+		if self.bondNum <= self.menNum:
 			butList.append(MenBut(self.bondNum))
 			
 	def AtomLoad(self):
@@ -204,8 +215,6 @@ class GameInit(ShowBase):
 
 	def __LoadClose(self):
 		taskMgr.remove("BubblePop")	
-				
-#		base.camera.setZ(20)
 		
 		self.__erlFlask.detachNode()
 		self.__bubbleOne.detachNode()
@@ -219,13 +228,21 @@ class GameInit(ShowBase):
 		del self.__bubbleThree
 		del self.__loadingText
 		
+		mod = 0
 		for i in range(len(butList)):
 			butList[i][0].reparentTo(base.render)
 			butList[i][1].reparentTo(base.render)
 			butList[i][2].reparentTo(base.render)
-
-		base.camera.lookAt(butList[2][1])
 			
+			butList[i][0].setZ(butList[i][0].getZ() + mod)
+			butList[i][1].setZ(butList[i][1].getZ() + mod)
+			butList[i][2].setZ(butList[i][2].getZ() + mod)
+			
+			butList[i][1].lookAt(base.camera)
+			
+			mod += (15/self.menNum)
+			
+		base.camera.lookAt(butList[math.floor(self.menNum/2)][1])			
 		
 		
 		

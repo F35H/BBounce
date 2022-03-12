@@ -1,2 +1,0 @@
-Framerate = 60
-Frontloading = True

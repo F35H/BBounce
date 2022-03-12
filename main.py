@@ -1,4 +1,4 @@
-from hub import GameInit
+from scripts/hub import GameInit
 
-__game = GameInit()
+__game = GInit()
 base.run()

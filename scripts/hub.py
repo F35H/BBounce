@@ -1,6 +1,3 @@
-from direct.showbase.ShowBase import ShowBase
-from direct.gui.OnscreenText import OnscreenText
-
 from panda3d.core import	AmbientLight, PointLight
 from panda3d.core import	ClockObject
 
@@ -8,106 +5,26 @@ import threading
 import math
 import time
 
+
+
+base = 0
 butList = []
 atomList = []
 bondList = []
 
-class GameMain(ShowBase):
-	
-	
-	def __init__(self):
-		print("Hello!")
+class GMens():
+	def __init__():
 		
-	def _GameSet(self):
-		Clock.setMode(ClockObject.MLimited)
-		Clock.setFrameRate(60)
-		
-		self.disableMouse()
+	def 
 	
 
-class MenBut():
-	def __new__(self, selectNum):
-		self.modTup = self.__ModLoad(selectNum)
-		self.__EndSet(selectNum)	
-		return self.modTup
-	
-	def __Texload(num):
-		match num:
-			case 0: return base.loader.loadTexture("texture/MenBut/BBLogo.png")
-			case 1: return base.loader.loadTexture("texture/MenBut/BBPlay.png")
-			case 2: return base.loader.loadTexture("texture/MenBut/BBAbout.png")
-			case 3: return base.loader.loadTexture("texture/MenBut/BBHow.png")
-			case 4: return base.loader.loadTexture("texture/MenBut/BBExit.png")
-			case _: print("Caution: wrong Variable in menbut!")
-	
-	def __ModLoad(num):
-		MenBut.modTup = [0,0,0]
-		
-		MenBut.modTup[0] = base.loader.loadModel("bam/erlflask.bam")
-		if num == 1:
-			MenBut.modTup[1] = base.loader.loadModel("bam/logo.bam")
-		else:
-			MenBut.modTup[1] = base.loader.loadModel("bam/menBut.bam")
-		MenBut.modTup[2] = base.loader.loadModel("bam/erlflask.bam")
-		
-		return MenBut.modTup
-		
-	def __EndSet(num):
-#			self.modTup[0]
-#		MenBut.modTup[0].setTexture(MenBut.textTup[1], 1)
-#		MenBut.modTup[2]
-			
-		if num == 1:
-			MenBut.modTup[0].hide()
-			MenBut.modTup[1].setPos(0,-20, 1)
-			MenBut.modTup[2].hide()
-			
-			
-		else:
-			MenBut.modTup[0].setPos(7,-20,-0.4)
-			MenBut.modTup[1].setPos(0,-20,-0)
-			MenBut.modTup[2].setPos(-7,-20,-0.4)
-			
-		MenBut.modTup[0].setScale(0.20)
-		MenBut.modTup[1].setScale(0.75)
-		MenBut.modTup[2].setScale(0.20)
-		
-		MenBut.modTup[0].setHpr(0,0,-40)
-		MenBut.modTup[2].setHpr(0,0,40)
-		
-		
-			
-class Atom():
-	def __new__(self):
-		self.__load__()
-		return self.atom
-		
-	def __load__():
-		Atom.atom = base.loader.loadModel("bam/sphere.bam")
-		
-		Atom.atom.setColor(0,0,0,1)
-	
-class Bond():
-	def __new__(self):
-		self.__load__()
-		return self.bond
-		
-	def __load__():
-		Bond.bond = base.loader.loadModel("bam/bond.bam")
-		
-		Bond.bond.setColor(0,0,0,1)
 
-class GameInit(ShowBase):
+class GInit():
 
 	__camTime = 0
 	frameDegree = 90
 	
 	def __init__(self):
-		self.__WinInit()
-#		GameMain()
-
-	def __WinInit(self):
-		global base
 		base = ShowBase()
 		self.__LoadSet()
 
@@ -240,9 +157,16 @@ class GameInit(ShowBase):
 			
 			butList[i][1].lookAt(base.camera)
 			
-			mod += (15/self.menNum)
+			butList[i][0].hide()
+			butList[i][2].hide()
 			
-		base.camera.lookAt(butList[math.floor(self.menNum/2)][1])			
+			mod += (15/self.menNum)
+		
+		butList[1][1].setHpr(180,0,0)
+		base.camera.lookAt(butList[math.floor(self.menNum/2)][1])
+		
+		GMenu()
+		
 		
 		
 		
@@ -292,3 +216,6 @@ class GameInit(ShowBase):
 			self.__camTime = 0
 			
 		self.camera.lookAt(self.__centrlCube)
+
+
+

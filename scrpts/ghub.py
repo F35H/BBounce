@@ -1,21 +1,17 @@
-from panda3d.core import	AmbientLight, PointLight
-from panda3d.core import	ClockObject
+from direct.showbase.ShowBase import Showbase
+#Retrospective Direct.Showbase won't load
+from panda3d.core import AmbientLight, PointLight
+from panda3d.core import ClockObject
 
 import threading
 import math
 import time
-
-
 
 base = 0
 butList = []
 atomList = []
 bondList = []
 
-class GMens():
-	def __init__():
-		
-	def 
 	
 
 

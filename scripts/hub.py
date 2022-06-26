@@ -1,30 +1,12 @@
-from ursina import *
+from objs import *
 
 import threading
 import math
 import time
 
-base = 0
 butList = []
 atomList = []
 bondList = []
-
-class Models():
-  _sphere = "sphere.obj"
-  _cube = "cube.obj"
-  _erlFlask = "erlFlask.obj"
-  _sphere = "buttons.obj"
-
-class MenuBut():
-  def __new__(self, selectNum):
-    self.modTup = self.__ModLoad(selection)
-    self.endSet(selection)
-    return self.modTup
-    
-  def __ModLoad(num):
-    MenBut.modTup = [0,0,0]
-    
-    MenBut.modTup[0] = Entity(model="logo.obj") 
 
 class GInit():  
   def __init__(self):
@@ -33,9 +15,9 @@ class GInit():
     self.__LoadInit()
     
   def __LoadSet(self):
-    mouse.enabled = false;
+    mouse.enabled = False
     window.title = "Beaker Bounce"
-    
+
   def __LoadInit(self):
     #Vars for Bubble Pop
     self.__modThreads = []
@@ -44,8 +26,8 @@ class GInit():
     self.bondCheck = self.bondNum
     self.menNum = 5
     self.cubNum = 1
-    self.atomNum = 
-      math.floor(((2/3)*self.bondNum))
+    self.menPos = 0
+    self.atomNum = math.floor(((2/3)*self.bondNum))
     
     #Vars for LoadInit
     self.__erlFlask = Entity(parent=None)
@@ -54,11 +36,12 @@ class GInit():
     self.__bubbleThree = Entity(parent=None)
     self.__loadingText = Text(parent=None)
     
-    self.__erlFlask.model = "models/erlflask"
-    self.__bubbleOne.model = "models/sphere"
-    self.__bubbleTwo.model = "models/sphere"
-    self.__bubbleThree.model = "models/sphere"
-    self.__loadingText.text = "models/sphere"
+    self.__loadingText.text = "Dummy"
+    
+    self.__erlFlask.model = erlFlask
+    self.__bubbleOne.model = sphere
+    self.__bubbleTwo.model = sphere
+    self.__bubbleThree.model = sphere
     
     self.__erlFlask.color = color.rgb(1, 1, 1, 1)
     self.__bubbleOne.color = color.rgb(1, 1, 1, 1)
@@ -66,20 +49,22 @@ class GInit():
     self.__bubbleThree.color = color.rgb(1, 1, 1, 1)
     self.__loadingText.color = color.rgb(1, 1, 1, 1)
     
+    
+    #Bezier Curves Go Here!
     self.__erlFlask.position = (0,0,0)
-    self.__bubbleOne.position  = (0,0,0)
-    self.__bubbleTwo.position = (0,0,0)
-    self.__bubbleThree.position = (0,0,0)
-    self.__loadingText.position = (0,-0.3,0)    
+    self.__bubbleOne.position  = (0,1,0)
+    self.__bubbleTwo.position = (-0.25,1.25,0)
+    self.__bubbleThree.position = (-0.5,1.5,0)
+    self.__loadingText.position = (0,-1,0)    
     
     self.__erlFlask.scale = 0.2
-    self.__bubbleOne.scale = 0.19
+    self.__bubbleOne.scale = 0.20
     self.__bubbleTwo.scale = 0.15
     self.__bubbleThree.scale = 0.1
-    self.__loadingText.scale = .07
+    self.__loadingText.scale = .10
     
-    camera.position  = self.__erlFlask.position    
-    camera.y = (self.__erlFlask.y + 20)
+#    camera.position  = self.__erlFlask.y = -20    
+#    camera.y = (self.__erlFlask.y + 20)
     
     self.__erlFlask.parent = scene        
     self.__bubbleOne.parent = scene        
@@ -87,35 +72,39 @@ class GInit():
     self.__bubbleThree.parent = scene        
     self.__loadingText.parent = scene
     
-    base.taskMgr.add(self.__BubblePop, "Pop")
+    taskMgr.add(self.__BubblePop, "Pop")
     
-def __BubblePop(self, task):
-  if self.__frames % 10 == 0:
+  def __BubblePop(self, task):
     if self.__frames % 7 == 0: 
       self.__bubbleOne.hide() 
-    else self.__bubblesOne.show()
-    
+    else: 
+      self.__bubbleOne.show()
+      
     if self.__frames % 4 == 0: 
       self.__bubbleThree.hide() 
-    else self.__bubblesThree.show()
-    
+        
+    else: 
+      self.__bubbleThree.show()
+      
     if self.__frames % 3 == 0: 
       self.__bubbleTwo.hide() 
-    else self.__bubblesTwo.show()
+    else: 
+      self.__bubbleTwo.show()
+      
+    if self.__frames >= self.bondCheck:
+      for i in range(len(self.__modThreads)):
+        self.__modThreads[i][0].join()
+        self.__modThreads[i][1].join()
+        self.__modThreads[i][2].join()
+        self.__LoadClose()
+        
+    else:
+      threading.Thread(target = self.MThreadLoad())
+      
+      self.bondNum -= 1
+      self.__frames += 1
     
-  if self.__frames >= self.bondCheck:
-    for i in range(len(self.__modThreads)):
-      self.__modThrreads[i][0].join()
-      self.__modThrreads[i][1].join()
-      self.__modThrreads[i][2].join()
-    self.__LoadClose()
-  else:
-    threading.Thread(target = self.MThreadLoad())
-    
-    self.bondNum -= 1
-    self.__frames += 1
-  
-  return task.count
+    return task.cont
         
   def MThreadLoad(self):
     lock = threading.Lock()
@@ -127,22 +116,26 @@ def __BubblePop(self, task):
       threading.Thread(target = self.BondLoad())))
       
       self.__modThreads[self.__frames][0].start()    
-      self.__modThreads[self.__frames][0].start()    
-      self.__modThreads[self.__frames][0].start()
+      self.__modThreads[self.__frames][1].start()    
+      self.__modThreads[self.__frames][2].start()
         
   def EssentialModLoad(self):
     global butList
     
     if self.bondNum <= self.cubNum:
-      self.__centrlCube = Entity()
-      self.__centrlCube.model = "models/cube"
-      
+      self.__centrlCube = Entity(parent=None)
+      self.__centrlCube.model = cube
+      self.__centrlCube.hide()
+   
     if self.bondNum <= self.menNum:
-      butList.append(MenBut(self.bondNum))
+      butList.append(MenBtn(self.bondNum, 
+        self.menPos))
+        
+      self.menPos += (.15*self.menNum)
     
   def AtomLoad(self):
     global atomList
-    
+
     if self.bondNum < self.atomNum:
       atomList.append(Atom()) 
       
@@ -156,28 +149,20 @@ def __BubblePop(self, task):
     self.__erlFlask.detachNode()
     self.__bubbleOne.detachNode()
     self.__bubbleTwo.detachNode()
-    self.__bubb;eThree.detachNode()
+    self.__bubbleThree.detachNode()
     self.__loadingText.detachNode()
     
-    mod = 0
     for i in range(len(butList)):
-      butList[i][0].parent = scene
-      butList[i][1].parent = scene
-      butList[i][2].parent = scene
+      butList[i][0].visible = True
+      butList[i][1].visible = True
+      butList[i][2].visible = True
       
-      butList[i][0].z += mod
-      butList[i][1].z += mod
-      butList[i][2].z += mod
+      butList[i][2].text = Text(text="Hello")
+      butList[i][2].text_color=color.white
       
-      butList[i][1].look_at(camera)
       
-      butList[i][0].hide()
-      butList[i][2].hide()
-      
-      mod += (15/self.menNum)
-      
-    butList[1][1].rotation_x = 100
-    camera.look_at(butList[mat.floor(self.menNum/2][1])
+    camera.look_at(
+      butList[math.floor(self.menNum/2)][1])
         
     
     

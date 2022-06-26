@@ -146,19 +146,17 @@ class GInit():
   def __LoadClose(self):
     taskMgr.remove("Pop")
     
-    self.__erlFlask.detachNode()
-    self.__bubbleOne.detachNode()
-    self.__bubbleTwo.detachNode()
-    self.__bubbleThree.detachNode()
-    self.__loadingText.detachNode()
+    self.__erlFlask.parent = None
+    self.__bubbleOne.parent = None
+    self.__bubbleTwo.parent = None
+    self.__bubbleThree.parent = None
+    self.__loadingText.parent = None
     
     for i in range(len(butList)):
       butList[i][0].visible = True
       butList[i][1].visible = True
       butList[i][2].visible = True
-      
-      butList[i][2].text = Text(text="Hello")
-      butList[i][2].text_color=color.white
+      butList[i][3].visible = True
       
       
     camera.look_at(

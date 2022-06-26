@@ -1,0 +1,4 @@
+*.blend
+*.mtl
+scripts/__pycache__/
+__pycache__/

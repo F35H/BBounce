@@ -1,22 +1,85 @@
 from objs import *
 
+from panda3d.core import ClockObject
+
 import threading
 import math
 import time
+
+base = Ursina()
 
 butList = []
 atomList = []
 bondList = []
 
+class GameLoop:
+  def __init__(self):
+    self.__LoadSet()
+    self.__LoadInit()
+    
+class MainMenu:
+  def __init__(self):
+    self.__LoadBtn__()
+    
+  def __LoadBtn__(self):
+		base.camera.lookAt(
+			butList[math.floor(
+			self.menNum/2)][1])
+  
+		for i in enumerate(butList):
+      butList[i][0].visible = True
+      butList[i][1].visible = True
+      butList[i][2].visible = True
+      butList[i][3].visible = True
+     
+      match MenBtn.indx:
+				case 1:
+					MenBtn.btnTup[3].text = "Beaker Bounce"
+					
+				case 2:
+					MenBtn.btnTup[3].text = "Start Simulation"
+					
+					MenBtn.btnTup[1].on_click = self.__PlayGme
+					
+				case 3:
+					MenBtn.btnTup[3].text = "How to Play"
+					
+					MenBtn.btnTup[1].on_click = self.__HTPlay
+					
+				case 4:
+					MenBtn.btnTup[3].text = "About"
+					
+					MenBtn.btnTup[1].on_click = self.__About
+					
+				case 5:
+					MenBtn.btnTup[3].text = "Exit"
+					
+					MenBtn.btnTup[1].on_click = self.__Exit
+  
+  def __PlayGme(self):
+		GameLoop()
+		
+  def __HTPlay(self):
+		
+  
+  def __About(self):
+  
+  
+  def __Exit(self):
+		sys.exit()
+  
+    
 class GInit():  
   def __init__(self):
-    base = Ursina()
     self.__LoadSet()
     self.__LoadInit()
     
   def __LoadSet(self):
     mouse.enabled = False
     window.title = "Beaker Bounce"
+    
+    base.clock.setMode(ClockObject.MLimited)
+    base.clock.setFrameRate(120)
 
   def __LoadInit(self):
     #Vars for Bubble Pop
@@ -27,28 +90,21 @@ class GInit():
     self.menNum = 5
     self.cubNum = 1
     self.menPos = 0
-    self.atomNum = math.floor(((2/3)*self.bondNum))
+    self.atomNum = math.floor(
+			((2/3)*self.bondNum))
     
     #Vars for LoadInit
-    self.__erlFlask = Entity(parent=None)
-    self.__bubbleOne = Entity(parent=None)
-    self.__bubbleTwo = Entity(parent=None)
-    self.__bubbleThree = Entity(parent=None)
-    self.__loadingText = Text(parent=None)
+    self.__erlFlask = Entity()
+    self.__bubbleOne = Entity()
+    self.__bubbleTwo = Entity()
+    self.__bubbleThree = Entity()
+    self.__loadingText = Text()
     
-    self.__loadingText.text = "Dummy"
-    
-    self.__erlFlask.model = erlFlask
-    self.__bubbleOne.model = sphere
-    self.__bubbleTwo.model = sphere
-    self.__bubbleThree.model = sphere
-    
-    self.__erlFlask.color = color.rgb(1, 1, 1, 1)
-    self.__bubbleOne.color = color.rgb(1, 1, 1, 1)
-    self.__bubbleTwo.color = color.rgb(1, 1, 1, 1)
-    self.__bubbleThree.color = color.rgb(1, 1, 1, 1)
-    self.__loadingText.color = color.rgb(1, 1, 1, 1)
-    
+    self.__erlFlask.color = color.white
+    self.__bubbleOne.color = color.white
+    self.__bubbleTwo.color = color.white
+    self.__bubbleThree.color = color.white
+    self.__loadingText.color = color.white
     
     #Bezier Curves Go Here!
     self.__erlFlask.position = (0,0,0)
@@ -63,14 +119,12 @@ class GInit():
     self.__bubbleThree.scale = 0.1
     self.__loadingText.scale = .10
     
-#    camera.position  = self.__erlFlask.y = -20    
-#    camera.y = (self.__erlFlask.y + 20)
+    self.__erlFlask.model = erlFlask
+    self.__bubbleOne.model = sphere
+    self.__bubbleTwo.model = sphere
+    self.__bubbleThree.model = sphere
     
-    self.__erlFlask.parent = scene        
-    self.__bubbleOne.parent = scene        
-    self.__bubbleTwo.parent = scene        
-    self.__bubbleThree.parent = scene        
-    self.__loadingText.parent = scene
+    self.__loadingText.text = "Test..." 
     
     taskMgr.add(self.__BubblePop, "Pop")
     
@@ -123,9 +177,9 @@ class GInit():
     global butList
     
     if self.bondNum <= self.cubNum:
-      self.__centrlCube = Entity(parent=None)
+      self.__centrlCube = Entity()
+      self.__centrlCube.visible = False
       self.__centrlCube.model = cube
-      self.__centrlCube.hide()
    
     if self.bondNum <= self.menNum:
       butList.append(MenBtn(self.bondNum, 
@@ -151,16 +205,8 @@ class GInit():
     self.__bubbleTwo.parent = None
     self.__bubbleThree.parent = None
     self.__loadingText.parent = None
-    
-    for i in range(len(butList)):
-      butList[i][0].visible = True
-      butList[i][1].visible = True
-      butList[i][2].visible = True
-      butList[i][3].visible = True
       
-      
-    camera.look_at(
-      butList[math.floor(self.menNum/2)][1])
+    MainMenu()
         
     
     

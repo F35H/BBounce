@@ -1,6 +1,7 @@
 
 #TODO
 
-* Finish Adding Text to Buttons
 * Finish the loading screen by finishing text and adding bezier curves
-* Add functions to buttons
+* Fix Button Class to work with Init and not New
+* Test Atom to check for apparent issue
+* If issue does not persist, update all other classes

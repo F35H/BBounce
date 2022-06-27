@@ -12,6 +12,11 @@ butList = []
 atomList = []
 bondList = []
 
+menNum = 5
+
+#Python, why?
+true = True 
+
 class GameLoop:
   def __init__(self):
     self.__LoadSet()
@@ -19,54 +24,56 @@ class GameLoop:
     
 class MainMenu:
   def __init__(self):
+    self.__LoadSet__()
     self.__LoadBtn__()
     
+  def __LoadSet__(self):
+    mouse.enabled = True  
+    
   def __LoadBtn__(self):
-		base.camera.lookAt(
-			butList[math.floor(
-			self.menNum/2)][1])
+    base.camera.lookAt(
+		  butList[math.floor(
+		  menNum/2)][1])
   
-		for i in enumerate(butList):
-      butList[i][0].visible = True
-      butList[i][1].visible = True
-      butList[i][2].visible = True
-      butList[i][3].visible = True
+    for i, btnTup in enumerate(butList):
+      btnTup[1].visible = True
+      btnTup[3].visible = True
      
-      match MenBtn.indx:
-				case 1:
-					MenBtn.btnTup[3].text = "Beaker Bounce"
+      match i:
+        case 4:
+          btnTup[2].visible = True
+          btnTup[0].visible = True
+          
+          btnTup[3].text = "Beaker Bounce"
+          btnTup[1].disabled = True
+        case 3:
+          btnTup[3].text = "Start Simulation"
+          btnTup[1].on_click = self.__PlayGme
 					
-				case 2:
-					MenBtn.btnTup[3].text = "Start Simulation"
+        case 2:
+          btnTup[3].text = "How to Play"
+          btnTup[1].on_click = self.__HTPlay
+          
+        case 1:
+           btnTup[3].text = "About"
+           btnTup[1].on_click = self.__About
 					
-					MenBtn.btnTup[1].on_click = self.__PlayGme
-					
-				case 3:
-					MenBtn.btnTup[3].text = "How to Play"
-					
-					MenBtn.btnTup[1].on_click = self.__HTPlay
-					
-				case 4:
-					MenBtn.btnTup[3].text = "About"
-					
-					MenBtn.btnTup[1].on_click = self.__About
-					
-				case 5:
-					MenBtn.btnTup[3].text = "Exit"
-					
-					MenBtn.btnTup[1].on_click = self.__Exit
+        case 0:
+           btnTup[3].text = "Exit"
+           btnTup[1].on_click = self.__Exit
+          
   
   def __PlayGme(self):
-		GameLoop()
+    GameLoop()
 		
   def __HTPlay(self):
-		
+    pass
   
   def __About(self):
-  
+    pass
   
   def __Exit(self):
-		sys.exit()
+    sys.exit()
   
     
 class GInit():  
@@ -77,9 +84,6 @@ class GInit():
   def __LoadSet(self):
     mouse.enabled = False
     window.title = "Beaker Bounce"
-    
-    base.clock.setMode(ClockObject.MLimited)
-    base.clock.setFrameRate(120)
 
   def __LoadInit(self):
     #Vars for Bubble Pop
@@ -87,11 +91,10 @@ class GInit():
     self.__frames = 0
     self.bondNum = 150
     self.bondCheck = self.bondNum
-    self.menNum = 5
     self.cubNum = 1
     self.menPos = 0
     self.atomNum = math.floor(
-			((2/3)*self.bondNum))
+      ((2/3)*self.bondNum))
     
     #Vars for LoadInit
     self.__erlFlask = Entity()
@@ -181,11 +184,11 @@ class GInit():
       self.__centrlCube.visible = False
       self.__centrlCube.model = cube
    
-    if self.bondNum <= self.menNum:
+    if self.bondNum <= menNum:
       butList.append(MenBtn(self.bondNum, 
         self.menPos))
         
-      self.menPos += (.15*self.menNum)
+      self.menPos += (.15*menNum)
     
   def AtomLoad(self):
     global atomList
@@ -199,6 +202,12 @@ class GInit():
     
   def __LoadClose(self):
     taskMgr.remove("Pop")
+
+    self.__erlFlask.visible = False
+    self.__bubbleOne.visible = False
+    self.__bubbleTwo.visible = False
+    self.__bubbleThree.visible = False
+    self.__loadingText.visible = False
     
     self.__erlFlask.parent = None
     self.__bubbleOne.parent = None

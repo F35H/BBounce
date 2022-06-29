@@ -32,8 +32,8 @@ class MainMenu:
     
   def __LoadBtn__(self):
     base.camera.lookAt(
-		  butList[math.floor(
-		  menNum/2)][1])
+      butList[math.floor(
+      menNum/2)][1])
   
     for i, btnTup in enumerate(butList):
       btnTup[1].visible = True
@@ -49,7 +49,7 @@ class MainMenu:
         case 3:
           btnTup[3].text = "Start Simulation"
           btnTup[1].on_click = self.__PlayGme
-					
+          
         case 2:
           btnTup[3].text = "How to Play"
           btnTup[1].on_click = self.__HTPlay
@@ -57,7 +57,7 @@ class MainMenu:
         case 1:
            btnTup[3].text = "About"
            btnTup[1].on_click = self.__About
-					
+          
         case 0:
            btnTup[3].text = "Exit"
            btnTup[1].on_click = self.__Exit
@@ -65,7 +65,7 @@ class MainMenu:
   
   def __PlayGme(self):
     GameLoop()
-		
+    
   def __HTPlay(self):
     pass
   
@@ -73,7 +73,7 @@ class MainMenu:
     pass
   
   def __Exit(self):
-    sys.exit()
+    application.exit()
   
     
 class GInit():  
@@ -186,7 +186,7 @@ class GInit():
    
     if self.bondNum <= menNum:
       butList.append(MenBtn(self.bondNum, 
-        self.menPos))
+        self.menPos).btnTup)
         
       self.menPos += (.15*menNum)
     

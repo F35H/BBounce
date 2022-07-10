@@ -5,7 +5,7 @@ cube = "cube"
 erlFlask = "erlFlask.obj"
 bond = "bond.obj"
 
-class SMenBtn(Obj):
+class SMenBtn():
 	def __init__(self, indx, sInd):
 		self.__indx = indx
 		self.__sInd = sInd
@@ -14,10 +14,10 @@ class SMenBtn(Obj):
 		self._load()
 	
 	def _load():
+		pass
 		
-		
-	def _create()
-	
+	def _create():
+	  pass
 		
 	def _load(self):
 		self.btnTup[0] = Button(parent=scene)
@@ -29,7 +29,7 @@ class SMenBtn(Obj):
 		self.btnTup[0].position = (1.5,0,-10)
 		self.btnTup[1].position = (0,0,-10)
 		
-class MenScrn(sMenBtn):
+class MenScrn(SMenBtn):
 	def __init__(self, indx, pos):
 		self.__indx = pos
 		self.__sInd = sInd
@@ -59,21 +59,21 @@ class MenBtn():
 		self.btnTup[2].visible = False
 		self.btnTup[3].visible = False
 
-		self.btnTup[0].position = (1.5,0,-10)
-		self.btnTup[1].position = (0,0,-10)
-		self.btnTup[2].position = (-1.5,0,-10)
-		self.btnTup[3].position = (0,0,-10)
+
+		self.btnTup[0].position = (1.5,-1.25,0)
+		self.btnTup[1].position = (0,-1.25,0)
+		self.btnTup[2].position = (-1.5,-1.25,0)
+		self.btnTup[3].position = (0,-1.25,0)
 		
 		self.btnTup[1].y += self.__sInd
 		self.btnTup[0].y += self.__sInd
 		self.btnTup[2].y += self.__sInd
 		self.btnTup[3].y += self.__sInd
-		self.btnTup[3].x -= (self.__sInd * .01)
 		
 		self.btnTup[0].scale = 0.05
-		self.btnTup[1].scale = 0.25
+		self.btnTup[1].scale = 0.58
 		self.btnTup[2].scale = 0.05
-		self.btnTup[3].scale = 2
+		self.btnTup[3].scale = 5
 		
 		self.btnTup[0].rotation_z = -40
 		self.btnTup[2].rotation_z = 40
@@ -102,10 +102,10 @@ class MenBtn():
 		btnTup[3].on_click = func 
 		
 	def __del__(self):
-		self.btnTup[0].visible = false
-		self.btnTup[1].visible = false
-		self.btnTup[2].visible = false
-		self.btnTup[3].visible = false
+		self.btnTup[0].visible = False
+		self.btnTup[1].visible = False
+		self.btnTup[2].visible = False
+		self.btnTup[3].visible = False
 		
 		self.btnTup[3].parent = None
 		self.btnTup[2].parent = None

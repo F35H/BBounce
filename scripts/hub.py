@@ -31,14 +31,11 @@ class MainMenu:
     mouse.enabled = True  
     
   def __LoadBtn__(self):
-    base.camera.lookAt(
-      butList[math.floor(
-      menNum/2)][1])
   
     for i, btnTup in enumerate(butList):
       btnTup[1].visible = True
       btnTup[3].visible = True
-     
+           
       match i:
         case 4:
           btnTup[2].visible = True
@@ -153,7 +150,8 @@ class GInit():
         self.__modThreads[i][0].join()
         self.__modThreads[i][1].join()
         self.__modThreads[i][2].join()
-        self.__LoadClose()
+        
+      self.__LoadClose()
         
     else:
       threading.Thread(target = self.MThreadLoad())

@@ -64,7 +64,7 @@ class MainMenu:
     GameLoop()
     
   def __HTPlay(self):
-    pass
+    MenScrn()
   
   def __About(self):
     pass
